@@ -1,1 +1,150 @@
-# zjioniz3160.github.io
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>GTM 실습 — 페이지 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f5f5f5; font-family: 'DM Sans', sans-serif; padding: 40px; color: #111; }
+
+    h1 { font-family: 'DM Mono', monospace; font-size: 14px; letter-spacing: 2px; color: #888; margin-bottom: 40px; }
+
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 11px; letter-spacing: 3px; color: #aaa;
+      text-transform: uppercase; margin-bottom: 16px;
+      padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #111;
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      margin: 6px;
+      letter-spacing: 1px;
+    }
+    .btn:hover { background: #333; }
+    .btn.outline { background: transparent; color: #111; border: 1px solid #111; }
+    .btn.outline:hover { background: #111; color: #fff; }
+
+    .event-label {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      background: #e8f4e8;
+      color: #2d7a2d;
+      padding: 2px 8px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .nav-link {
+      display: inline-block;
+      margin: 6px;
+      padding: 10px 24px;
+      background: #fff;
+      border: 1px solid #ddd;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #111;
+    }
+    .nav-link:hover { border-color: #111; }
+
+    input[type="email"] {
+      padding: 10px 16px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      width: 220px;
+      outline: none;
+    }
+
+
+
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: #111; color: #fff;
+      padding: 8px 20px; font-size: 12px;
+      opacity: 0; transition: all 0.2s;
+      pointer-events: none; z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<h1>GTM 실습 — PAGE 1 / 2 &nbsp;&nbsp; <a href="page2.html" style="color:#888;font-size:11px;">페이지 2로 →</a></h1>
+
+<!-- 1. 네비게이션 클릭 -->
+<div class="section">
+  <p class="section-title">1. 네비게이션 클릭 <span class="event-label">nav_click</span></p>
+  <a class="nav-link" href="#" onclick="push('nav_click',{menu:'홈'});return false;">홈</a>
+  <a class="nav-link" href="#" onclick="push('nav_click',{menu:'상품'});return false;">상품</a>
+  <a class="nav-link" href="#" onclick="push('nav_click',{menu:'브랜드'});return false;">브랜드</a>
+  <a class="nav-link" href="page2.html" onclick="push('nav_click',{menu:'페이지2'});">페이지 2</a>
+</div>
+
+<!-- 2. 버튼 클릭 -->
+<div class="section">
+  <p class="section-title">2. 버튼 클릭 <span class="event-label">button_click</span></p>
+  <button class="btn" onclick="push('button_click',{button:'배너 클릭', location:'hero'})">배너 클릭</button>
+  <button class="btn outline" onclick="push('button_click',{button:'더보기', location:'section'})">더보기</button>
+  <button class="btn outline" onclick="push('button_click',{button:'공유하기', location:'content'})">공유하기</button>
+</div>
+
+<!-- 3. 상품 클릭 -->
+<div class="section">
+  <p class="section-title">3. 상품 클릭 <span class="event-label">view_item</span></p>
+  <button class="btn" onclick="push('view_item',{item_id:'P001', item_name:'울 코트', price:298000})">울 코트</button>
+  <button class="btn" onclick="push('view_item',{item_id:'P002', item_name:'실크 드레스', price:186000})">실크 드레스</button>
+  <button class="btn" onclick="push('view_item',{item_id:'P003', item_name:'버킷햇', price:89000})">버킷햇</button>
+</div>
+
+<!-- 4. 뉴스레터 -->
+<div class="section">
+  <p class="section-title">4. 뉴스레터 구독 <span class="event-label">newsletter_signup</span></p>
+  <form onsubmit="newsletter(event)" style="display:flex;gap:0;align-items:center;">
+    <input type="email" id="email" placeholder="이메일 입력" required>
+    <button class="btn" type="submit" style="margin:0;">구독하기</button>
+  </form>
+</div>
+
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function push(name, params) {
+    window.dataLayer.push({ event: name, ...params });
+    toast(name + ' ✅');
+  }
+
+  function newsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    push('newsletter_signup', { email_domain: email.split('@')[1] || 'unknown' });
+    document.getElementById('email').value = '';
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  // page_view 자동 발생
+  push('page_view', { page: 'page1', page_location: window.location.href });
+</script>
+</body>
+</html>
