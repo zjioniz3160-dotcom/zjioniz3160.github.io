@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>GTM 실습 — 페이지 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f5f5f5; font-family: 'DM Sans', sans-serif; padding: 40px; color: #111; }
+
+    h1 { font-family: 'DM Mono', monospace; font-size: 14px; letter-spacing: 2px; color: #888; margin-bottom: 40px; }
+
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 11px; letter-spacing: 3px; color: #aaa;
+      text-transform: uppercase; margin-bottom: 16px;
+      padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #111; color: #fff;
+      border: none; font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer; margin: 6px; letter-spacing: 1px;
+    }
+    .btn:hover { background: #333; }
+    .btn.outline { background: transparent; color: #111; border: 1px solid #111; }
+    .btn.outline:hover { background: #111; color: #fff; }
+    .btn.danger { background: #c44; }
+    .btn.danger:hover { background: #a33; }
+
+    .event-label {
+      display: inline-block;
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      background: #e8f4e8; color: #2d7a2d;
+      padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+    }
+
+    /* 사이즈 버튼 */
+    .size-btn {
+      width: 48px; height: 48px;
+      border: 1px solid #ddd; background: #fff;
+      font-size: 12px; cursor: pointer; margin: 4px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .size-btn.selected, .size-btn:hover { background: #111; color: #fff; border-color: #111; }
+
+    /* 가격 표시 */
+    .price-box {
+      display: inline-block;
+      padding: 16px 24px;
+      background: #fff;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+    }
+    .product-price { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; }
+    .product-price .original { font-size: 13px; color: #aaa; text-decoration: line-through; margin-left: 8px; }
+
+    /* 구매 완료 */
+    .purchase-done {
+      display: none;
+      background: #111; color: #fff;
+      padding: 32px; margin-top: 16px;
+      text-align: center;
+    }
+    .purchase-done.show { display: block; }
+    .purchase-done h3 { font-size: 20px; font-weight: 300; margin-bottom: 8px; }
+    .purchase-done p { color: #888; font-size: 12px; margin-bottom: 20px; }
+
+
+
+    .toast {
+      position: fixed; top: 20px; left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: #111; color: #fff;
+      padding: 8px 20px; font-size: 12px;
+      opacity: 0; transition: all 0.2s;
+      pointer-events: none; z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<h1>GTM 실습 — PAGE 2 / 2 &nbsp;&nbsp; <a href="index.html" style="color:#888;font-size:11px;">← 페이지 1로</a></h1>
+
+<!-- 1. 사이즈 선택 -->
+<div class="section">
+  <p class="section-title">1. 사이즈 선택 <span class="event-label">select_size</span></p>
+  <div>
+    <button class="size-btn" onclick="selectSize(this,'XS')">XS</button>
+    <button class="size-btn" onclick="selectSize(this,'S')">S</button>
+    <button class="size-btn" onclick="selectSize(this,'M')">M</button>
+    <button class="size-btn" onclick="selectSize(this,'L')">L</button>
+    <button class="size-btn" onclick="selectSize(this,'XL')">XL</button>
+  </div>
+</div>
+
+<!-- 2. 가격 요소 (DOM 변수 실습) -->
+<div class="section">
+  <p class="section-title">2. 가격 요소 (DOM 변수 실습) <span class="event-label">.product-price</span></p>
+  <div class="price-box">
+    <span class="product-price">₩298,000 <span class="original">₩420,000</span></span>
+  </div>
+  <br>
+  <small style="color:#aaa;font-size:11px;">← GTM 변수: CSS 선택자 .product-price 로 이 값을 읽어옵니다</small>
+</div>
+
+<!-- 3. 장바구니 담기 -->
+<div class="section">
+  <p class="section-title">3. 장바구니 담기 <span class="event-label">add_to_cart</span></p>
+  <button class="btn" onclick="addToCart()">장바구니 담기</button>
+</div>
+
+<!-- 4. 위시리스트 -->
+<div class="section">
+  <p class="section-title">4. 위시리스트 <span class="event-label">add_to_wishlist</span></p>
+  <button class="btn outline" onclick="push('add_to_wishlist',{item_id:'P001', item_name:'울 코트', price:298000})">위시리스트 담기</button>
+</div>
+
+<!-- 5. 결제 -->
+<div class="section">
+  <p class="section-title">5. 결제 <span class="event-label">begin_checkout → purchase</span></p>
+  <button class="btn danger" onclick="checkout()">결제하기</button>
+  <div class="purchase-done" id="purchase-done">
+    <h3>✓ 구매 완료</h3>
+    <p>purchase 이벤트가 dataLayer에 푸시되었습니다</p>
+    <button class="btn outline" style="color:#fff;border-color:#fff;" onclick="reset()">다시 실습하기</button>
+  </div>
+</div>
+
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  let selectedSize = null;
+
+  function push(name, params) {
+    window.dataLayer.push({ event: name, ...params });
+    toast(name + ' ✅');
+  }
+
+  function selectSize(btn, size) {
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedSize = size;
+    push('select_size', { item_id: 'P001', item_name: '울 코트', size: size });
+  }
+
+  function addToCart() {
+    if (!selectedSize) { toast('사이즈를 먼저 선택하세요!'); return; }
+    push('add_to_cart', { item_id: 'P001', item_name: '울 코트', price: 298000, size: selectedSize, currency: 'KRW' });
+  }
+
+  function checkout() {
+    push('begin_checkout', { value: 298000, currency: 'KRW' });
+    setTimeout(() => {
+      push('purchase', { transaction_id: 'ORD-' + Date.now(), value: 298000, currency: 'KRW' });
+      document.getElementById('purchase-done').classList.add('show');
+    }, 600);
+  }
+
+  function reset() {
+    document.getElementById('purchase-done').classList.remove('show');
+    selectedSize = null;
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  push('page_view', { page: 'page2', page_location: window.location.href });
+</script>
+</body>
+</html>
